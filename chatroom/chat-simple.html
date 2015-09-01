@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Simple Chatroom</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+		<style type="text/css">
+			body {
+				padding-top: 80px;
+			} 
+			
+			#messages {
+				margin-top: 25px;	
+			}
+		</style>
+		
+	</head>
+
+<body>
+
+	<!-- top navigation -->
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Simple Chatroom</a>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container">
+
+		<!-- chat form -->
+		<form id="chatform" class="form-inline">
+			<input id="message" type="text" placeholder="What do you want to say?" class="form-control" style="width: 50%" />
+			<input id="chatbtn" type="submit" value="Send" class="btn btn-primary" />
+		</form>
+
+		<!-- messages -->
+		<ul id="messages" class="list-group"></ul>
+		
+	</div>
+
+	<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	
+	<script type="text/javascript">
+
+			var pubnub;
+
+			// when the page is finished loading
+			$(document).ready(function()
+			{
+				// initialize pubnub (obtain your keys from http://www.pubnub.com/)
+				pubnub = PUBNUB.init(
+				{
+					publish_key : 'YOURPUBLISHKEY',
+					subscribe_key : 'YOURSUBSCRIBEKEY'
+				});
+
+				// subscribe to a channel
+				pubnub.subscribe(
+				{
+					channel: "thechatroom",
+					message: handleMessage
+				});
+
+				// when a user sends a message
+				$('#chatform').submit(function(e)
+				{
+					// prevent a page reload
+					e.preventDefault();
+
+					// publish the message to everyone
+					pubnub.publish(
+					{
+						channel: "thechatroom",
+						message: {
+							text: $('#message').val()
+						}
+					})
+
+					// clear the message textbox
+					$('#message').val('');
+				});
+			});
+
+			// when a message is received
+			function handleMessage(message)
+			{
+				// add the message to the screen
+				$('#messages').append("<li class=\"list-group-item\">" + message.text + "</li>");
+			}
+
+		</script>
+
+	</body>
+</html>

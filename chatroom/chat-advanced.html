@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Advanced Chatroom</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+		<style type="text/css">
+			body {
+				padding-top: 80px;
+			} 
+			
+			#messages {
+				margin-top: 25px;	
+				height: 300px; 
+				overflow: scroll;
+			}
+		</style>
+		
+	</head>
+
+<body>
+
+	<!-- top navigation -->
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Simple Chatroom</a>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container">
+		
+		<!-- enter name -->
+		<div id="enterscreen">
+			<form id="enterform" class="form-inline">
+				<input id="username" name="username" type="text" placeholder="What is your name?" class="form-control" style="width: 50%" />
+				<input id="enterbtn" type="submit" value="Enter" class="btn btn-primary" />
+			</form>
+		</div>
+
+		<!-- chatroom -->
+		<div id="chatscreen" style="display: none">
+
+			<form id="chatform" class="form-inline">
+				<input id="message" type="text" placeholder="What do you want to say?" class="form-control" style="width: 50%" />
+				<input id="chatbtn" type="submit" value="Send" class="btn btn-primary" />
+			</form>
+
+			<ul id="messages" class="list-group"></ul>
+			
+		</div>
+		
+	</div>
+
+	<script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	
+	<script type="text/javascript">
+
+			var pubnub;
+			var username;
+
+			// when the page is finished loading
+			$(document).ready(function()
+			{
+				// when the user enters in their username
+				$('#enterform').submit(function (e) 
+				{
+					// prevents the page from refreshing
+					e.preventDefault();
+
+					// check for a username
+					if ($('#username').val() != '') 
+					{
+						// assigns the username variable to what was typed into the form
+						username = $('#username').val();
+
+						// clear the username field
+						$('#username').val('');
+					
+					} else {
+						
+						// assign a generic username - this is not a good way to do this, btw
+						username = 'Anonymous';
+						
+					}
+
+					// show the chatroom div
+					$('#enterscreen').hide();
+					$('#chatscreen').show();
+
+					// initialize pubnub (obtain your keys from http://www.pubnub.com/)
+					pubnub = PUBNUB.init(
+					{
+						publish_key : 'YOURPUBLISHKEY',
+						subscribe_key : 'YOURSUBSCRIBEKEY',
+						uuid: username
+					});
+
+					// subscribe to a channel
+					pubnub.subscribe(
+					{
+						channel : "chat",
+						message: handleMessage
+					});
+				});
+
+				// when a user posts a chat message
+				$('#chatform').submit(function(e) 
+				{
+					// prevents the page from refreshing
+					e.preventDefault();
+
+					// if the message isn't empty
+					if ($('#message').val() != '') 
+					{
+						// publish the message to everyone in the chatroom
+						pubnub.publish(
+						{
+							channel: 'chat',
+							message: {
+								username: username,
+								text: $('#message').val()
+							}
+						});
+
+						// clear the message field
+						$('#message').val('');
+					}
+				});
+
+			});
+
+			// when a message is received
+			function handleMessage(message)
+			{
+				// add the message to the screen
+				$('#messages').append("<li class=\"list-group-item\">" + message.username + ": " + message.text + "</li>");
+				
+				// automatically scroll the div
+				$('#messages').scrollTop(300);
+			}
+
+		</script>
+
+	</body>
+</html>

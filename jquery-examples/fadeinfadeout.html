@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>jQuery Demo - FadeIn &amp; FadeOut</title>
+		
+		<!-- jQuery -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		
+		<script type="text/javascript">
+			
+			// when the document is ready
+			$(document).ready(function() 
+			{
+				// fade in text
+				$('#mylink1').click(function(e)
+				{
+					$('#mytext').fadeIn();
+				});
+				
+				// fade out text
+				$('#mylink2').click(function(e)
+				{
+					$('#mytext').fadeOut();
+				});
+			});
+
+		</script>
+
+		<style type="text/css">
+			h1 {
+				font-size: 3em;
+				background-color: #caeeff;
+				color: #39f;
+				margin: 0 0 20px 0;
+				padding: 20px;
+				border: 2px solid #39f;
+			}
+		</style>
+		
+	</head>
+	<body>
+	
+		<!-- text -->
+		<h1 id="mytext">This is text</h1>
+	
+		<!-- link -->
+		<a id="mylink1" href="#">Fade In</a> | 
+		<a id="mylink2" href="#">Fade Out</a>
+	
+	</body>
+</html>
